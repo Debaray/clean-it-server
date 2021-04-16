@@ -41,7 +41,14 @@ client.connect(err => {
         //         res.send(result.insertedCount > 0);
         //     })
     })
-
+    app.post('/addAdmin', (req, res) => {
+        const email = req.body.email;
+        console.log({email});
+        // doctorCollection.insertOne({ name, email, image })
+        //     .then(result => {
+        //         res.send(result.insertedCount > 0);
+        //     })
+    })
 
    
 
