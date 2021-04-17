@@ -24,8 +24,15 @@ client.connect(err => {
   const serviceCollection = client.db(`${process.env.DB_NAME}`).collection("service");
   app.post('/addAService', (req, res) => {
     const file = req.files.file;
-    const name = req.body.serviceTitle;
-    const email = req.body.description;
+    const title = req.body.serviceTitle;
+    const description = req.body.description;
+    const allShirtsPrice = req.body.allShirts;
+    const pantsJeansSkirtsPrice = req.body.pantsJeansSkirts;
+    const sweatersPrice = req.body.sweaters;
+    const tieScarfPrice = req.body.tieScarf;
+    const coatHeavyJacketDressPrice = req.body.coatHeavyJacketDress;
+    const silkSuedeLeathersPrice = req.body.silkSuedeLeathers;
+    const curtainsDraperyPrice = req.body.curtainsDrapery;
     const newImg = file.data;
     const encImg = newImg.toString('base64');
 
@@ -34,8 +41,8 @@ client.connect(err => {
       size: file.size,
       img: Buffer.from(encImg, 'base64')
     };
-    console.log({ name, email, image });
-    serviceCollection.insertOne({ name, email, image })
+    console.log({ title, description, image,allShirtsPrice,pantsJeansSkirtsPrice,sweatersPrice,tieScarfPrice,coatHeavyJacketDressPrice ,silkSuedeLeathersPrice,curtainsDraperyPrice});
+    serviceCollection.insertOne({ title, description, image,allShirtsPrice,pantsJeansSkirtsPrice,sweatersPrice,tieScarfPrice,coatHeavyJacketDressPrice ,silkSuedeLeathersPrice,curtainsDraperyPrice})
       .then(result => {
         res.send(result.insertedCount > 0);
       })
