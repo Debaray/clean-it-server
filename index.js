@@ -6,13 +6,12 @@ const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.swu9d.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.bvy8r.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const app = express()
 
 app.use(bodyParser.json());
 app.use(cors());
-app.use(express.static('doctors'));
 app.use(fileUpload());
 
 app.get('/', (req, res) => {
@@ -21,38 +20,40 @@ app.get('/', (req, res) => {
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
-    const groceryCollection = client.db(`${process.env.DB_NAME}`).collection("products");
-    const ordersCollection = client.db(`${process.env.DB_NAME}`).collection("orders");
-    app.post('/addAService', (req, res) => {
-        const file = req.files.file;
-        const name = req.body.serviceTitle;
-        const email = req.body.description;
-        const newImg = file.data;
-        const encImg = newImg.toString('base64');
+  const adminCollection = client.db(`${process.env.DB_NAME}`).collection("admin");
+  const serviceCollection = client.db(`${process.env.DB_NAME}`).collection("service");
+  app.post('/addAService', (req, res) => {
+    const file = req.files.file;
+    const name = req.body.serviceTitle;
+    const email = req.body.description;
+    const newImg = file.data;
+    const encImg = newImg.toString('base64');
 
-        var image = {
-            contentType: file.mimetype,
-            size: file.size,
-            img: Buffer.from(encImg, 'base64')
-        };
-        console.log({ name, email, image });
-        // doctorCollection.insertOne({ name, email, image })
-        //     .then(result => {
-        //         res.send(result.insertedCount > 0);
-        //     })
-    })
-    app.post('/addAdmin', (req, res) => {
-        const email = req.body.email;
-        console.log({email});
-        // doctorCollection.insertOne({ name, email, image })
-        //     .then(result => {
-        //         res.send(result.insertedCount > 0);
-        //     })
-    })
+    var image = {
+      contentType: file.mimetype,
+      size: file.size,
+      img: Buffer.from(encImg, 'base64')
+    };
+    console.log({ name, email, image });
+    serviceCollection.insertOne({ name, email, image })
+      .then(result => {
+        res.send(result.insertedCount > 0);
+      })
+  })
+  app.post('/addAdmin', (req, res) => {
+    const newAdmin = req.body;
 
-   
+    console.log(newAdmin);
+    adminCollection.insertOne(newAdmin)
+      .then(result => {
+        res.send(result.insertedCount > 0);
+      })
+  })
+  console.log('db connection established');
+
 
 });
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
