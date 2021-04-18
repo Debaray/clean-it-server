@@ -22,6 +22,15 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   const adminCollection = client.db(`${process.env.DB_NAME}`).collection("admin");
   const serviceCollection = client.db(`${process.env.DB_NAME}`).collection("service");
+
+  app.get('/services', (req, res) => {
+    serviceCollection.find()
+      .toArray((err, services) => {
+        res.send(services)
+      })
+  })
+
+
   app.post('/addAService', (req, res) => {
     const file = req.files.file;
     const title = req.body.serviceTitle;
