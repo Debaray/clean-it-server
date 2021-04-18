@@ -22,11 +22,19 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   const adminCollection = client.db(`${process.env.DB_NAME}`).collection("admin");
   const serviceCollection = client.db(`${process.env.DB_NAME}`).collection("service");
+  const reviewCollection = client.db(`${process.env.DB_NAME}`).collection("review");
 
   app.get('/services', (req, res) => {
     serviceCollection.find()
       .toArray((err, services) => {
         res.send(services)
+      })
+  })
+
+  app.get('/reviews', (req, res) => {
+    reviewCollection.find()
+      .toArray((err, reviews) => {
+        res.send(reviews)
       })
   })
 
@@ -61,6 +69,15 @@ client.connect(err => {
 
     console.log(newAdmin);
     adminCollection.insertOne(newAdmin)
+      .then(result => {
+        res.send(result.insertedCount > 0);
+      })
+  })
+
+  app.post('/addReview', (req, res) => {
+    const newReview = req.body;
+    console.log(newReview);
+    reviewCollection.insertOne(newReview)
       .then(result => {
         res.send(result.insertedCount > 0);
       })
