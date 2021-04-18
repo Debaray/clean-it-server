@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectID = require('mongodb').ObjectID;
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
@@ -80,6 +81,15 @@ client.connect(err => {
     reviewCollection.insertOne(newReview)
       .then(result => {
         res.send(result.insertedCount > 0);
+      })
+  })
+
+
+  app.delete('/deleteService/:id', (req, res) => {
+    const id = ObjectID(req.params.id);
+    serviceCollection.deleteOne({ _id: id })
+      .then(documents => {
+        res.send(documents.deletedCount > 0);
       })
   })
   console.log('db connection established');
