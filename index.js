@@ -24,6 +24,7 @@ client.connect(err => {
   const adminCollection = client.db(`${process.env.DB_NAME}`).collection("admin");
   const serviceCollection = client.db(`${process.env.DB_NAME}`).collection("service");
   const reviewCollection = client.db(`${process.env.DB_NAME}`).collection("review");
+  const bookingsCollection = client.db(`${process.env.DB_NAME}`).collection("bookings");
 
   app.get('/services', (req, res) => {
     serviceCollection.find()
@@ -34,6 +35,13 @@ client.connect(err => {
 
   app.get('/reviews', (req, res) => {
     reviewCollection.find()
+      .toArray((err, reviews) => {
+        res.send(reviews)
+      })
+  })
+
+  app.get('/bookings', (req, res) => {
+    bookingsCollection.find()
       .toArray((err, reviews) => {
         res.send(reviews)
       })
@@ -59,8 +67,8 @@ client.connect(err => {
       size: file.size,
       img: Buffer.from(encImg, 'base64')
     };
-    console.log({ title, description, image,allShirtsPrice,pantsJeansSkirtsPrice,sweatersPrice,tieScarfPrice,coatHeavyJacketDressPrice ,silkSuedeLeathersPrice,curtainsDraperyPrice});
-    serviceCollection.insertOne({ title, description, image,allShirtsPrice,pantsJeansSkirtsPrice,sweatersPrice,tieScarfPrice,coatHeavyJacketDressPrice ,silkSuedeLeathersPrice,curtainsDraperyPrice})
+    console.log({ title, description, image, allShirtsPrice, pantsJeansSkirtsPrice, sweatersPrice, tieScarfPrice, coatHeavyJacketDressPrice, silkSuedeLeathersPrice, curtainsDraperyPrice });
+    serviceCollection.insertOne({ title, description, image, allShirtsPrice, pantsJeansSkirtsPrice, sweatersPrice, tieScarfPrice, coatHeavyJacketDressPrice, silkSuedeLeathersPrice, curtainsDraperyPrice })
       .then(result => {
         res.send(result.insertedCount > 0);
       })
@@ -84,7 +92,21 @@ client.connect(err => {
       })
   })
 
-
+  app.post('/addBooking', (req, res) => {
+    const bookings = req.body;
+    console.log(bookings);
+    bookingsCollection.insertOne(bookings)
+      .then(result => {
+        res.send(result.insertedCount > 0);
+      })
+  })
+  app.post('/isAdmin', (req, res) => {
+    const email = req.body.email;
+    adminCollection.find({ email: email })
+      .toArray((err, admins) => {
+        res.send(admins.length > 0);
+      })
+  })
   app.delete('/deleteService/:id', (req, res) => {
     const id = ObjectID(req.params.id);
     serviceCollection.deleteOne({ _id: id })
@@ -92,6 +114,22 @@ client.connect(err => {
         res.send(documents.deletedCount > 0);
       })
   })
+
+  app.patch('/update/:id', (req, res) => {
+   
+    const id = ObjectID(req.params.id);
+    console.log(req.body.status,id);
+    bookingsCollection.updateOne({ _id: id },
+        {
+            $set: {
+                status: req.body.status
+            }
+        })
+        .then(result => {
+            res.send(result.modifiedCount > 0);
+        })
+
+})
   console.log('db connection established');
 
 
